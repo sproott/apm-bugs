@@ -1,0 +1,12 @@
+# APM dependencies
+apm_modules/
+
+# Lockfile and output dirs, ignored for reproduction
+apm.lock.yaml
+.claude/
+.codex/
+.cursor/
+.gemini/
+.github/
+.opencode/
+.windsurf/

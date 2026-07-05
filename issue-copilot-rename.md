@@ -54,4 +54,4 @@ See the warning block above.
 
 **Additional context**
 
-Minimal reproduction: https://github.com/sproott/apm-bugs (`make copilot-rename`).
+Minimal reproduction: https://github.com/sproott/apm-bugs (`make copilot-rename` in `hooks/`).

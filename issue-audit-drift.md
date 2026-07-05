@@ -11,8 +11,8 @@ only difference on each flagged file is the `_apm_source` ownership marker:
 
 ```diff
 # .claude/apm-hooks.json  (audit replay  vs  what `apm install` wrote)
--      "_apm_source": "apm-bugs"
-+      "_apm_source": "_local/apm-bugs"
+-      "_apm_source": "hooks"
++      "_apm_source": "_local/hooks"
 ```
 
 `HookIntegrator._get_hook_source_marker()` returns `"_local/<name>"` for the
@@ -24,10 +24,10 @@ def _is_root_local_package(package_info, project_root):
 ```
 
 - At **install** time `project_root` is the real project dir and equals the
-  self-package's `install_path` → `True` → marker `"_local/apm-bugs"`.
+  self-package's `install_path` → `True` → marker `"_local/hooks"`.
 - During the **audit replay**, writes are redirected to a scratch dir, so the
   integrator's `project_root` is the scratch tmpdir while `install_path` still
-  points at the real project → `False` → bare `"apm-bugs"`.
+  points at the real project → `False` → bare `"hooks"`.
 
 So the replay stamps a different marker than install did, and every hook entry
 carrying `_apm_source` differs byte-for-byte from disk. Normalization
@@ -69,4 +69,4 @@ See the drift block above.
 
 **Additional context**
 
-Minimal reproduction: https://github.com/sproott/apm-bugs (`make audit`).
+Minimal reproduction: https://github.com/sproott/apm-bugs (`make audit` in `hooks/`).

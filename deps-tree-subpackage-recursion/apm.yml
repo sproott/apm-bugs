@@ -1,0 +1,18 @@
+name: deps-tree-subpackage-recursion
+version: 1.0.0
+description: Consumer that depends on the fixture as a REMOTE virtual
+  sub-package. Because the parent is remote, the fixture's local path deps are
+  expanded to inherit the parent repo_url, and `apm deps tree` then keys
+  parent<->child on that non-unique repo_url, self-nesting the sub-packages.
+author: sproott
+targets:
+  - claude
+dependencies:
+  # Remote virtual sub-package: the ./fixture subpath of THIS repo, fetched
+  # over the network (not resolved as a local path). This is what makes the
+  # fixture a "remote parent".
+  apm:
+    - sproott/apm-bugs/deps-tree-subpackage-recursion/fixture#main
+  mcp: []
+includes: auto
+scripts: {}

@@ -1,0 +1,15 @@
+name: fixture-root
+version: 1.0.0
+description: Fixture root package. Declares a local path dependency on its own
+  sub-package ./packages/inner. When this package is consumed as a REMOTE
+  virtual sub-package, that local dep is expanded to inherit the parent's
+  repo_url, which triggers the deps-tree self-nesting bug.
+author: sproott
+targets:
+  - claude
+dependencies:
+  apm:
+    - ./packages/inner
+  mcp: []
+includes: auto
+scripts: {}

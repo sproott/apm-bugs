@@ -1,0 +1,14 @@
+name: fixture-inner
+version: 1.0.0
+description: Middle sub-package. Depends on a sibling local path ../leaf, so the
+  chain is root -> inner -> leaf. All three live in the same repo and (once
+  expanded under a remote parent) share one repo_url.
+author: sproott
+targets:
+  - claude
+dependencies:
+  apm:
+    - ../leaf
+  mcp: []
+includes: auto
+scripts: {}

@@ -1,0 +1,12 @@
+name: fixture-leaf
+version: 1.0.0
+description: Terminal leaf sub-package. No further dependencies. Its presence at
+  every nesting level in `apm deps tree` output is the visible symptom.
+author: sproott
+targets:
+  - claude
+dependencies:
+  apm: []
+  mcp: []
+includes: auto
+scripts: {}

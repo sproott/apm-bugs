@@ -1,0 +1,11 @@
+name: sub-package
+version: 1.0.0
+description: Transitive production dependency, resolved into the consumer lockfile.
+author: sproott
+targets:
+  - claude
+dependencies:
+  apm: []
+  mcp: []
+includes: auto
+scripts: {}

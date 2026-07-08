@@ -51,6 +51,12 @@ Conventions when filling it in:
 - **Environment**: record the `apm --version` you actually observed on.
 - **Logs**: real captured command output — never invented.
 - **Additional context**: link to the minimal reproduction directory.
+- **No local `.md` cross-links inside an issue.** The issue is filed on GitHub, so
+  a link to a sibling `issue-<other>.md` is dead there. Cite related bugs by their
+  filed **GitHub issue number** (`#1846`). If the related bug is not filed yet, ask
+  the user to file it and supply the number (or leave a `#PLACEHOLDER` and flag it).
+  This applies to `issue-*.md` only — README.md is the local index and may link
+  local files freely.
 - Record **current state and the finding as a whole** — no gradual findings, no
   "we chose X to isolate Y", no historical steps. State the fact, not the path to
   it. (The numbered "To Reproduce" steps are reproduction instructions, not

@@ -1,0 +1,16 @@
+name: package
+version: 1.0.0
+description: Local package with a production transitive dependency.
+author: sproott
+targets:
+  - claude
+dependencies:
+  # Production dependency on a sibling package. Source lives at ../sub-package
+  # (outside this package's own dir), so the transitive install lands at
+  # apm_modules/_local/sub-package with depth 2 -- and NOT nested inside
+  # _local/package, keeping this repro clear of the nested-package bug.
+  apm:
+    - ../sub-package
+  mcp: []
+includes: auto
+scripts: {}

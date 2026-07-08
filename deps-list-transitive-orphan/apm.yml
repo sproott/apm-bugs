@@ -1,0 +1,14 @@
+name: transitive-orphan-root
+version: 1.0.0
+description: Root that depends on a local package which pulls a production transitive dep.
+author: sproott
+targets:
+  - claude
+dependencies:
+  # Local package. Its own apm.yml declares a *production* transitive dep on
+  # a sibling package (../sub-package), which APM resolves into this consumer.
+  apm:
+    - ./package
+  mcp: []
+includes: auto
+scripts: {}

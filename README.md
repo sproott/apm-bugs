@@ -13,6 +13,12 @@ the issue files:
   a top-level orphan: `apm deps list` and `apm prune` treat it as a direct
   orphaned dep and prune deletes it, while `apm audit --ci` passes — the two
   disagree. (Observed on `apm` **v0.24.0**.)
+- [`issue-deps-list-transitive-orphan.md`](issue-deps-list-transitive-orphan.md) —
+  a local **production** transitive dep, recorded in the consumer lockfile with
+  `depth: 2`, is labelled `orphaned` by `apm deps list` while `apm prune` reports
+  the tree clean — the two disagree. Root cause: `deps list` keys its
+  lockfile-inclusion loop by the raw `local_path` (`./sub-package`), mismatching
+  the filesystem scan key `_local/sub-package`. (Observed on `apm` **v0.24.0**.)
 
 ## Hook bugs (`hooks/`)
 
@@ -140,5 +146,50 @@ make audit                  # install + `apm deps list` + `apm audit --ci`
 make prune                  # install + `apm prune` + install
                             #   -> _local/package/sub-package deleted (a subfolder of the
                             #      installed package); the next apm install restores it
+```
+
+## Transitive-orphan bug (`deps-list-transitive-orphan/`)
+
+### Setup
+
+The root [`deps-list-transitive-orphan/apm.yml`](deps-list-transitive-orphan/apm.yml)
+has a single **production** dependency, the local package
+[`package/`](deps-list-transitive-orphan/package/), which declares its own
+**production** dependency on the sibling package
+[`sub-package/`](deps-list-transitive-orphan/sub-package/):
+
+```yaml
+# package/apm.yml
+dependencies:
+  apm:
+    - ../sub-package
+```
+
+`apm install` resolves the transitive `../sub-package` into the consumer and
+locks it as a real install (`_local/sub-package`, `depth: 2`, `resolved_by:
+_local/package`). The sibling (`../`) layout keeps its source outside the
+installed `package/` dir, so nothing nested is scanned — unlike the
+[`nested-package-orphans/`](nested-package-orphans/) bug above. Yet `apm deps
+list` labels `_local/sub-package` `orphaned` while `apm prune` reports the tree
+clean: the two disagree. Root cause: `deps list` keys its lockfile-inclusion loop
+by the raw `local_path`, mismatching the `_local/<name>` filesystem scan key that
+`prune` (correctly) uses. Full write-up in
+[`issue-deps-list-transitive-orphan.md`](issue-deps-list-transitive-orphan.md).
+
+`make clean` removes the lockfile, installed `apm_modules/`, and generated
+target dirs.
+
+### Reproduce
+
+```bash
+apm --version               # 0.24.0
+cd deps-list-transitive-orphan
+
+make deps-list              # clean + install + `apm deps list`
+                            #   -> flags _local/sub-package as orphaned, despite the
+                            #      lockfile recording it as a depth-2 install
+
+make prune                  # clean + install + `apm prune --dry-run`
+                            #   -> "No orphaned packages found": disagrees with deps list
 ```
 

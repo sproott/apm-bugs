@@ -7,7 +7,7 @@ description: End-to-end workflow for reproducing and reporting an APM CLI bug in
 
 The full loop for adding a bug to this repo. See the `repo-orientation`
 instructions for where the APM source lives and the repo layout; use the
-`issue-authoring` skill for the write-up step (5).
+`issue-authoring` skill for the write-up step (6).
 
 ## 1. Reproduce the raw symptom
 
@@ -47,7 +47,26 @@ file) and re-checking the lockfile + command output.
   regenerates state and never touches checked-in `apm.yml`.
 - Run every target and confirm it exits 0 and reproduces before moving on.
 
-## 5. Write it up
+## 5. Check for existing / duplicate issues
+
+Before writing it up, search the upstream tracker with `gh search issues`:
+
+```bash
+# Searches all states by default. This gh's --state takes only
+# {open|closed}; --state all errors, so omit it.
+gh search issues --repo microsoft/apm "local transitive dependency orphaned"
+gh search issues --repo microsoft/apm "orphaned" --match title
+gh search issues --repo microsoft/apm "get_canonical_dependency_string"
+```
+
+- Search the **offending symbol / key** (`get_canonical_dependency_string`,
+  `_local/sub-package`), not just prose.
+- Read the closest hits with `gh issue view <n> --repo microsoft/apm`. Closed
+  issues are included — check them (already-reported or already-fixed).
+- Genuine dup → don't file; note it. Adjacent issues (same family, different
+  root cause) → cite them in the write-up.
+
+## 6. Write it up
 
 Write `issue-<slug>.md` and the README entry — use the **`issue-authoring`**
 skill, which carries the canonical template and the write-up conventions (short

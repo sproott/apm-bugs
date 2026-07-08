@@ -8,6 +8,11 @@ the issue files:
 - [`issue-audit-drift.md`](issue-audit-drift.md) — `apm audit` reports phantom drift right after a clean install.
 - [`issue-devdeps.md`](issue-devdeps.md) — devDependencies are invisible to orphan
   detection: `apm prune` deletes any installed dev dep, `apm audit --ci` fails on it.
+- [`issue-nested-package-orphans.md`](issue-nested-package-orphans.md) — a
+  dependency's subpackage (a nested `apm.yml` from a subpath dep) is reported as
+  a top-level orphan: `apm deps list` and `apm prune` treat it as a direct
+  orphaned dep and prune deletes it, while `apm audit --ci` passes — the two
+  disagree. (Observed on `apm` **v0.24.0**.)
 
 ## Hook bugs (`hooks/`)
 
@@ -88,3 +93,52 @@ make prune                  # clean + install + `apm prune`
                             #   -> _local/sub-package deleted from apm_modules/;
                             #      the follow-up `apm install` puts it right back
 ```
+
+## Nested-package orphan bug (`nested-package-orphans/`)
+
+### Setup
+
+The root [`nested-package-orphans/apm.yml`](nested-package-orphans/apm.yml) has a
+single **production** dependency, the local package
+[`package/`](nested-package-orphans/package/), which in turn declares a
+dependency on a relative subpath whose source lives inside it at
+[`package/sub-package/`](nested-package-orphans/package/sub-package/):
+
+```yaml
+# package/apm.yml
+devDependencies:
+  apm:
+    - ./sub-package
+```
+
+`apm install` copies `package` into `apm_modules/_local/package/`, and its
+`sub-package/` subfolder comes along as part of the source. The subpackage is
+**not** a dependency of the consumer (its lockfile lists only `./package`), but
+the on-disk scan walks into the installed package and reports the nested
+`sub-package/` as a direct `orphaned` project dependency — so `apm prune`
+deletes it, while `apm audit --ci` (lockfile-based) reports everything is fine.
+The two disagree. Full write-up in
+[`issue-nested-package-orphans.md`](issue-nested-package-orphans.md).
+
+Different root cause from the [`dev-dependencies/`](dev-dependencies/) bug above:
+that one omits dev deps from the *declared* set; this one invents phantom
+packages in the *installed* set.
+
+`make clean` removes the lockfile, installed `apm_modules/`, and generated
+target dirs.
+
+### Reproduce
+
+```bash
+apm --version               # 0.24.0
+cd nested-package-orphans
+
+make audit                  # install + `apm deps list` + `apm audit --ci`
+                            #   -> deps list flags _local/package/sub-package as orphaned,
+                            #      but apm audit --ci passes: the two disagree
+
+make prune                  # install + `apm prune` + install
+                            #   -> _local/package/sub-package deleted (a subfolder of the
+                            #      installed package); the next apm install restores it
+```
+

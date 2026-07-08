@@ -1,0 +1,13 @@
+lockfile_version: '1'
+generated_at: '2026-07-08T07:40:16.035383+00:00'
+dependencies: []
+local_deployed_files:
+- .claude/rules/repo-orientation.md
+- .claude/skills/apm-bug-repro
+- .claude/skills/apm-bug-repro/SKILL.md
+- .claude/skills/issue-authoring
+- .claude/skills/issue-authoring/SKILL.md
+local_deployed_file_hashes:
+  .claude/rules/repo-orientation.md: sha256:2704af7e66ea16d88c926a3b4195f35594f91e740f0fce2a6023630340c090e3
+  .claude/skills/apm-bug-repro/SKILL.md: sha256:cc48493e4eb5bf23cee963a35ea63d1b8fea39e5c7076bfb7f444022c8084aac
+  .claude/skills/issue-authoring/SKILL.md: sha256:a8e6d03a44beb3bf28b6ad2f1e806688c809fe4fbe66920e4d322d77b5da0ca0

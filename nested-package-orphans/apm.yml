@@ -1,0 +1,23 @@
+name: transitive-dev-dependencies
+version: 1.0.0
+description: APM project for transitive-dev-dependencies
+author: sproott
+# Which agent platforms to deploy to.
+# Resolution order: --target flag > this field > auto-detect from filesystem.
+# Accepted values: vscode, agents, copilot, claude, cursor, opencode, codex,
+# gemini, antigravity, windsurf, kiro, agent-skills, all
+targets:
+  - claude
+  - codex
+  - cursor
+  - gemini
+  - opencode
+  - windsurf
+dependencies:
+  # Production dependency. Its own source tree bundles a nested package
+  # (./package/sub-package/), which it declares as a devDependency.
+  apm:
+    - ./package
+  mcp: []
+includes: auto
+scripts: {}

@@ -1,4 +1,4 @@
-# [BUG] `apm deps tree` matches parent↔child on `repo_url`, self-nesting a remote package's same-repo virtual sub-packages to the depth-5 cap
+# [BUG] `apm deps tree` self-nests a remote package's sub-packages recursively
 
 **Describe the bug**
 

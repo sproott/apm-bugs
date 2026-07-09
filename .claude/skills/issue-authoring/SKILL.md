@@ -43,7 +43,9 @@ Add any other context about the problem here.
 
 Conventions when filling it in:
 
-- **Title**: short — the root-cause statement, not a two-clause summary.
+- **Title**: short, single-clause. Describe **what** the user observes (the
+  symptom), not **why** it happens (the root cause) and not a two-clause summary.
+  Save the mechanism for **Describe the bug**.
 - **Describe the bug**: fold the root-cause analysis and source blob links here
   (`https://github.com/microsoft/apm/blob/main/src/apm_cli/...`).
 - **Expected behavior**: user-visible behavior only (commands succeeding, files

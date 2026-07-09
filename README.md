@@ -19,6 +19,14 @@ the issue files:
   the tree clean — the two disagree. Root cause: `deps list` keys its
   lockfile-inclusion loop by the raw `local_path` (`./sub-package`), mismatching
   the filesystem scan key `_local/sub-package`. (Observed on `apm` **v0.24.0**.)
+- [`issue-deps-tree-subpackage-recursion.md`](issue-deps-tree-subpackage-recursion.md) —
+  `apm deps tree` self-nests a **remote** package's same-repo virtual
+  sub-packages (root → inner → leaf) recursively into one another, up to the
+  depth-5 cap, repeating every sub-package and its skills at each level. Root
+  cause: the tree keys parent↔child on `repo_url`, which is not unique across
+  virtual sub-packages of one repo — it should use `get_unique_key()`
+  (repo_url + virtual_path). Display-only; the lockfile and `apm deps list` are
+  correct. (Observed on `apm` **v0.24.0**.)
 
 ## Hook bugs (`hooks/`)
 
@@ -191,5 +199,56 @@ make deps-list              # clean + install + `apm deps list`
 
 make prune                  # clean + install + `apm prune --dry-run`
                             #   -> "No orphaned packages found": disagrees with deps list
+```
+
+## Tree self-nesting bug (`deps-tree-subpackage-recursion/`)
+
+### Setup
+
+The root
+[`deps-tree-subpackage-recursion/apm.yml`](deps-tree-subpackage-recursion/apm.yml)
+depends on a fixture published as a **remote** virtual sub-package of this same
+repo:
+
+```yaml
+# apm.yml
+dependencies:
+  apm:
+    - sproott/apm-bugs/deps-tree-subpackage-recursion/fixture#main
+```
+
+The fixture ([`fixture/`](deps-tree-subpackage-recursion/fixture/)) chains three
+same-repo sub-packages via local paths — root → `./packages/inner` → `../leaf`
+(the leaf carries one skill). Because the parent is **remote**, those local
+paths are expanded to inherit the parent's `repo_url`, so all three
+sub-packages share one `repo_url` and differ only by `virtual_path`.
+
+`apm install` resolves exactly three packages (distinct `virtual_path`, correct
+`depth`), and `apm deps list` prints three rows — resolution is correct. But
+`apm deps tree` keys parent↔child on `repo_url` (not `get_unique_key()`), so
+every same-repo sub-package becomes a child of every other and the tree
+self-nests until the depth-5 recursion cap, repeating `fixture-leaf` and its
+skill at each level. Display-only. Full write-up in
+[`issue-deps-tree-subpackage-recursion.md`](issue-deps-tree-subpackage-recursion.md).
+
+The fixture is fetched from GitHub, so reproduction needs network access and the
+fixture pushed to `sproott/apm-bugs` `main`.
+
+`make clean` removes the lockfile, installed `apm_modules/`, and generated
+target dirs.
+
+### Reproduce
+
+```bash
+apm --version               # 0.24.0
+cd deps-tree-subpackage-recursion
+
+make tree                   # clean + install + `apm deps tree`
+                            #   -> root/inner/leaf self-nested five levels deep;
+                            #      leaf + its skill repeated at every level
+
+make audit                  # clean + install + `apm deps list` + `apm audit --ci`
+                            #   -> deps list shows exactly 3 packages, audit passes:
+                            #      resolution is correct, only the tree display is wrong
 ```
 

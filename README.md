@@ -27,6 +27,12 @@ the issue files:
   virtual sub-packages of one repo — it should use `get_unique_key()`
   (repo_url + virtual_path). Display-only; the lockfile and `apm deps list` are
   correct. (Observed on `apm` **v0.24.0**.)
+- [`issue-init-target-alias-leak.md`](issue-init-target-alias-leak.md) — `apm init
+  --target` writes a `targets:` value that `apm install` then rejects: the flag's
+  parser resolves `copilot`/`agents` to the internal name `vscode` (multi-token
+  input) or passes `agents` through verbatim (single-token), but neither is a
+  manifest-canonical target — so the scaffolded `apm.yml` aborts the next
+  `apm install` with `Unknown target`. (Observed on `apm` **v0.24.0**.)
 
 ## Hook bugs (`hooks/`)
 
@@ -252,3 +258,42 @@ make audit                  # clean + install + `apm deps list` + `apm audit --c
                             #      resolution is correct, only the tree display is wrong
 ```
 
+
+## init target-alias leak (`init-target-alias-leak/`)
+
+### Setup
+
+Three scenario directories, each holding one checked-in primitive
+([`.apm/instructions/demo.instructions.md`](init-target-alias-leak/control/.apm/instructions/demo.instructions.md))
+and nothing else — `apm.yml` is *generated* by `apm init`, because it is the
+artifact under test.
+
+`apm init --target <list>` writes the `--target` flag's parsed value straight
+into `targets:`. The flag's parser accepts the aliases `copilot`/`agents`/`vscode`
+and resolves them to the internal name `vscode` (multi-token input only); the
+manifest validator accepts neither `vscode` nor `agents`. So `init` can scaffold
+an `apm.yml` that the very next `apm install` refuses to read, exit 2. Full
+write-up in [`issue-init-target-alias-leak.md`](issue-init-target-alias-leak.md).
+
+`make clean` removes the generated `apm.yml`, lockfile, `apm_modules/`, and
+generated target dirs from every scenario.
+
+### Reproduce
+
+```bash
+apm --version               # 0.24.0
+cd init-target-alias-leak
+
+make control                # clean + `apm init --target copilot` + install
+                            #   -> targets: [copilot], install succeeds (exit 0)
+
+make multi                  # clean + `apm init --target claude,copilot` + install
+                            #   -> targets: [claude, vscode] -- copilot silently renamed;
+                            #      install aborts: Unknown target 'vscode' (exit 2)
+
+make agents                 # clean + `apm init --target agents` + install
+                            #   -> targets: [agents] passed through verbatim;
+                            #      install aborts: Unknown target 'agents' (exit 2)
+
+make reproduce              # all three in order
+```

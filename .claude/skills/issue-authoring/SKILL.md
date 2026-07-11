@@ -1,6 +1,6 @@
 ---
 name: issue-authoring
-description: Write or refine a bug issue and its README entry in the apm-bugs repo — the canonical bug template plus the write-up conventions (short title, surface-level expected behavior, current-state-only). Use when turning a reproduced/understood bug into issue-<slug>.md, editing an existing issue, or adding a bug's README entry. Referenced by the apm-bug-repro skill for its write-up step.
+description: Write or refine a bug issue or feature request and its README entry in the apm-bugs repo — the canonical bug and feature-request templates plus the write-up conventions (short title, surface-level expected behavior, current-state-only). Use when turning a reproduced/understood bug into issue-<slug>.md, writing a feature request as feature-<slug>.md, editing an existing issue, or adding a bug's README entry. Referenced by the apm-bug-repro skill for its write-up step.
 ---
 
 # Issue & README Authoring
@@ -66,6 +66,39 @@ Conventions when filling it in:
 - **One issue per root cause.** Same-cause variants stay in one issue (multiple
   `make` targets). A different cause is a separate issue; a deferred lead is a
   `handoff-<slug>.md`, which keeps its investigation framing.
+
+## The feature request file
+
+When the finding is a missing capability rather than broken behavior, write a
+feature request instead. Create `feature-<slug>.md` from the canonical template
+at the repo root (`feature-request-template.md`):
+
+```markdown
+# [FEATURE] xxxxx
+
+**Is your feature request related to a problem? Please describe.**
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+
+**Describe the solution you'd like**
+A clear and concise description of what you want to happen.
+
+**Describe alternatives you've considered**
+A clear and concise description of any alternative solutions or features you've considered.
+
+**Additional context**
+Add any other context or screenshots about the feature request here.
+```
+
+Conventions when filling it in:
+
+- **Title**: short, single-clause. Name the capability wanted, not the
+  implementation.
+- **Problem**: ground it in real friction actually hit while working — concrete
+  commands and output, not hypotheticals.
+- **Solution**: user-visible behavior only, same bar as a bug's expected
+  behavior — never internal implementation details.
+- The **no local `.md` cross-links** and **current-state-only** rules from bug
+  issues apply here unchanged.
 
 ## The README entry
 

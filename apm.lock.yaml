@@ -10,4 +10,4 @@ local_deployed_files:
 local_deployed_file_hashes:
   .claude/rules/repo-orientation.md: sha256:2704af7e66ea16d88c926a3b4195f35594f91e740f0fce2a6023630340c090e3
   .claude/skills/apm-bug-repro/SKILL.md: sha256:707f98ca54fa453849522e02bf8a815bc1fb9a6ae225011d10835e03db1ce3e1
-  .claude/skills/issue-authoring/SKILL.md: sha256:00b3e159bd4ebd52e4e5f90cfd3f6b842e5e7002c27cc426922acbc19ab29b4c
+  .claude/skills/issue-authoring/SKILL.md: sha256:1bf94878683313a3d66e58d26c7cf007f48cdc870d7c2d3ca7ebb4d547305df0

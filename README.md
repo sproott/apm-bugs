@@ -33,6 +33,15 @@ the issue files:
   input) or passes `agents` through verbatim (single-token), but neither is a
   manifest-canonical target — so the scaffolded `apm.yml` aborts the next
   `apm install` with `Unknown target`. (Observed on `apm` **v0.24.0**.)
+- [`issue-init-noninteractive-metadata.md`](issue-init-noninteractive-metadata.md)
+  (**RFE**, not a bug) — `apm init`'s interactive mode prompts for name, version,
+  description, and author, but its non-interactive mode (`--yes` / non-TTY) can
+  freely set none of them. No `--description`/`--version`/`--author` flags exist,
+  and the positional name arg always makes a subdir — so you can't name a project
+  in the current dir non-interactively (bare `--yes` forces the dir basename).
+  Scripted/CI init is stuck with boilerplate defaults (`description: APM project
+  for <name>`) and must hand-edit `apm.yml` — even though sibling `apm marketplace
+  init` already has `--name`/`--owner`. (Observed on `apm` **v0.24.0**.)
 
 ## Hook bugs (`hooks/`)
 

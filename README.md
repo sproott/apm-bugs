@@ -33,6 +33,13 @@ the issue files:
   input) or passes `agents` through verbatim (single-token), but neither is a
   manifest-canonical target — so the scaffolded `apm.yml` aborts the next
   `apm install` with `Unknown target`. (Observed on `apm` **v0.24.0**.)
+- [`issue-dep-skill-link-drift.md`](issue-dep-skill-link-drift.md) — `apm audit
+  --ci` reports false `modified` drift on a dependency's skill files right after a
+  clean install, whenever a skill bundle contains an in-package relative link
+  (e.g. `[pkg](../../README.md)`). Root cause: the audit-replay's link rewrite
+  re-anchors onto the dependency's `package_root`, dropping the
+  `apm_modules/<...>/` segment the real install keeps — the #1182 fix closed this
+  only for the self-package. (Observed on `apm` **v0.24.1**.)
 - [`issue-init-noninteractive-metadata.md`](issue-init-noninteractive-metadata.md)
   (**RFE**, not a bug) — `apm init`'s interactive mode prompts for name, version,
   description, and author, but its non-interactive mode (`--yes` / non-TTY) can
@@ -267,6 +274,45 @@ make audit                  # clean + install + `apm deps list` + `apm audit --c
                             #      resolution is correct, only the tree display is wrong
 ```
 
+
+## Dependency skill-link drift (`drift-dep-skill-links/`)
+
+### Setup
+
+The root [`drift-dep-skill-links/apm.yml`](drift-dep-skill-links/apm.yml) has a
+single local dependency, the package
+[`package/`](drift-dep-skill-links/package/), which ships one skill
+([`skills/demo/`](drift-dep-skill-links/package/skills/demo/)) whose bundle links
+to a sibling file inside the package (the package README, `../../README.md`).
+
+On install the skill integrator rewrites that in-package link so the deployed
+copy still resolves — from `.claude/skills/demo/` down to the file's post-install
+location: `../../../apm_modules/_local/package/README.md`. The `apm audit --ci`
+drift replay re-integrates from the lockfile into a scratch dir and recomputes
+the link as `../../../README.md` (the `apm_modules/_local/package/` segment
+dropped), so every deployed skill file carrying an in-package link differs
+byte-for-byte from disk and is reported as `modified` drift. Re-running `apm
+install` does not clear it. Full write-up in
+[`issue-dep-skill-link-drift.md`](issue-dep-skill-link-drift.md).
+
+Distinct root cause from the [`hooks/`](hooks/) phantom-drift bug: that one is
+the hook `_apm_source` ownership marker on the self-package; this one is
+dependency skill-bundle link rewriting mis-anchored during replay.
+
+`make clean` removes the lockfile, installed `apm_modules/`, and generated
+target dirs.
+
+### Reproduce
+
+```bash
+apm --version               # 0.24.1
+cd drift-dep-skill-links
+
+make audit                  # clean + install + `apm audit --ci`
+                            #   -> false `modified` drift on .claude/skills/demo/
+                            #      README.md and SKILL.md, exit 1 (drift persists
+                            #      across re-install)
+```
 
 ## init target-alias leak (`init-target-alias-leak/`)
 

@@ -1,0 +1,3 @@
+name: linkskill
+version: 0.1.0
+description: Package shipping one skill whose bundle links to a sibling package file.

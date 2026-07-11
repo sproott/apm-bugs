@@ -1,0 +1,12 @@
+name: skill-link-drift-consumer
+version: 0.1.0
+description: Consumer that installs a local package shipping a skill with an in-package relative link.
+targets:
+  - claude
+dependencies:
+  # Local dependency whose skill bundle links to a sibling file inside the
+  # package. On install the link is rewritten to point under
+  # apm_modules/_local/package/; the audit-replay recomputes it differently
+  # and reports the deployed file as drifted.
+  apm:
+    - ./package

@@ -49,6 +49,14 @@ the issue files:
   Scripted/CI init is stuck with boilerplate defaults (`description: APM project
   for <name>`) and must hand-edit `apm.yml` — even though sibling `apm marketplace
   init` already has `--name`/`--owner`. (Observed on `apm` **v0.24.0**.)
+- [`feature-recursive-install-audit.md`](feature-recursive-install-audit.md)
+  (**RFE**, not a bug) — `apm install` and `apm audit` operate only on the
+  directory they run from: in a monorepo with nested `apm.yml` packages, root
+  `apm install` refreshes the root mirror but leaves each package's own
+  (git-tracked) mirror silently stale, and root `apm audit --ci` passes anyway —
+  only a per-package audit catches the drift. Proposes `--recursive` on both,
+  reusing the existing `install --root DIR` primitive. (Observed on `apm`
+  **v0.24.1**.)
 
 ## Hook bugs (`hooks/`)
 
@@ -351,4 +359,39 @@ make agents                 # clean + `apm init --target agents` + install
                             #      install aborts: Unknown target 'agents' (exit 2)
 
 make reproduce              # all three in order
+```
+
+## Recursive install/audit gap (`recursive-install-audit/`) — RFE
+
+### Setup
+
+A two-level monorepo: the root
+[`recursive-install-audit/apm.yml`](recursive-install-audit/apm.yml) declares
+the nested package [`packages/pkg/`](recursive-install-audit/packages/pkg/) as
+a local-path dependency. The nested package's sentinel skill source
+(`packages/pkg/.apm/skills/demo/SKILL.md`, `marker: v1`) is *generated* by the
+Makefile, because the reproduction then mutates it to `marker: v2` — the
+stand-in for any real edit to a nested package's authored primitives.
+
+Root `apm install` re-resolves the local dep and deploys `v2` into the root
+mirror, but never refreshes the nested package's own mirror — and root
+`apm audit --ci` never checks it. Only `apm audit --ci` run inside the package
+catches the drift. Write-up (as a feature request for `--recursive`) in
+[`feature-recursive-install-audit.md`](feature-recursive-install-audit.md).
+
+`make clean` removes lockfiles, `apm_modules/`, generated mirrors, and the
+generated sentinel source from both levels.
+
+### Reproduce
+
+```bash
+apm --version               # 0.24.1
+cd recursive-install-audit
+
+make stale                  # clean + install both dirs + edit nested source + root install
+                            #   -> root .claude/ at v2; packages/pkg/.claude/ stale at v1
+
+make audit                  # stale + `apm audit --ci` at root and in packages/pkg
+                            #   -> root: all 9 checks pass (exit 0, blind);
+                            #      packages/pkg: drift on skills/demo/SKILL.md (exit 1)
 ```

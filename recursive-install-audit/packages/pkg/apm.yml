@@ -1,0 +1,5 @@
+name: pkg
+version: 0.1.0
+description: Nested package with its own apm.yml and its own deployed mirror.
+targets:
+  - claude

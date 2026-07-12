@@ -1,0 +1,12 @@
+name: monorepo-root
+version: 0.1.0
+description: Monorepo root that declares the nested package as a local dependency.
+targets:
+  - claude
+dependencies:
+  # The nested package is already known to the root as a local-path dependency
+  # (the usual monorepo wiring). Root `apm install` resolves and deploys it into
+  # the ROOT mirror, but never refreshes the package's own mirror under
+  # packages/pkg/.
+  apm:
+    - ./packages/pkg

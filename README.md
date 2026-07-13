@@ -395,3 +395,40 @@ make audit                  # stale + `apm audit --ci` at root and in packages/p
                             #   -> root: all 9 checks pass (exit 0, blind);
                             #      packages/pkg: drift on skills/demo/SKILL.md (exit 1)
 ```
+
+## `apm prune` has no global scope (`prune-global-scope/`) — RFE
+
+### Setup
+
+A trivial local package
+([`prune-global-scope/pkg/`](prune-global-scope/pkg/)) with one skill, installed
+to **user scope** (`apm install -g`). Every `-g` command in this demo is pinned
+to an isolated `HOME` (`prune-global-scope/fake-home/`, git-ignored) via the
+Makefile, so it never touches the real `~/.apm/` or `~/.claude/`.
+
+`apm prune` has no `--global`/`-g` flag and always operates on the current
+project, so orphaned packages under `~/.apm/apm_modules/` cannot be pruned — even
+though `install`/`uninstall`/`update`/`lock`/`compile` are all scope-aware. The
+only workaround (`cd ~/.apm && apm prune`) removes the `apm_modules/` tree but
+leaks the deployed primitive in the home deploy root, because user-scope
+deployment targets `~/` while a cwd-scoped prune only cleans under `~/.apm/`.
+Write-up (as a feature request for `--global`) in
+[`feature-prune-global-scope.md`](feature-prune-global-scope.md).
+
+`make clean` removes the isolated fake `HOME` (manifest, `apm_modules/`, deployed
+mirror, caches).
+
+### Reproduce
+
+```bash
+apm --version               # 0.25.0
+cd prune-global-scope
+
+make flag                   # `apm prune -g`
+                            #   -> Error: No such option: -g
+                            #      (sibling `apm uninstall -g` has it)
+
+make orphan                 # install -g + orphan it + `cd ~/.apm && apm prune`
+                            #   -> apm_modules/_local/pkg: REMOVED;
+                            #      ~/.agents/skills/demo/SKILL.md: SURVIVES (orphaned)
+```

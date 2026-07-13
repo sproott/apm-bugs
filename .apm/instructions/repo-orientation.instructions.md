@@ -41,6 +41,12 @@ CLI may be a different version than the submodule checkout — verify both).
 - `.apm/` — this package's authored primitives (instructions, skills). Edit here,
   then `apm install`; never edit deployed output under `.claude/`.
 
+**Git-ignore ownership**: a `.gitignore` pattern that only makes sense for one
+reproduction directory belongs in that directory's own `.gitignore`, not the root
+one. Keep the root `.gitignore` for repo-wide patterns (`apm_modules/`,
+`apm.lock.yaml`, deployed target dirs); scope demo-specific ephemera (e.g. an
+isolated `fake-home/`) to the subdir it belongs to.
+
 This repo is APM-managed: `AGENTS.md` / `CLAUDE.md` / `.claude/rules/*` (if
 present) are compiled from `.apm/` and are clobbered on `apm install` — author
 global instructions in `.apm/instructions/<name>.instructions.md`, not in the

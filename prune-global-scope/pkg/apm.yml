@@ -1,0 +1,11 @@
+name: demo-global-pkg
+version: 1.0.0
+description: Trivial local package installed to user scope (~/.apm/) for the prune -g demo.
+author: sproott
+targets:
+  - claude
+dependencies:
+  apm: []
+  mcp: []
+includes: auto
+scripts: {}

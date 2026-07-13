@@ -1,6 +1,52 @@
 lockfile_version: '1'
 generated_at: '2026-07-08T07:40:16.035383+00:00'
 dependencies: []
+deployments:
+- kind: project-relative
+  target: claude
+  value: .claude/rules/repo-orientation.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:7d1402357128dab9c577eb0e2d53109ed86c09ad11db543b4b071e6219af62c8
+- kind: project-relative
+  target: claude
+  value: .claude/skills/apm-bug-repro
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/apm-bug-repro/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:707f98ca54fa453849522e02bf8a815bc1fb9a6ae225011d10835e03db1ce3e1
+- kind: project-relative
+  target: claude
+  value: .claude/skills/issue-authoring
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/issue-authoring/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:80ae14e5a09090669d949d83a41afda02ed3d4d0ac1a06b59d9649671649b37d
 local_deployed_files:
 - .claude/rules/repo-orientation.md
 - .claude/skills/apm-bug-repro
@@ -8,6 +54,6 @@ local_deployed_files:
 - .claude/skills/issue-authoring
 - .claude/skills/issue-authoring/SKILL.md
 local_deployed_file_hashes:
-  .claude/rules/repo-orientation.md: sha256:2704af7e66ea16d88c926a3b4195f35594f91e740f0fce2a6023630340c090e3
+  .claude/rules/repo-orientation.md: sha256:7d1402357128dab9c577eb0e2d53109ed86c09ad11db543b4b071e6219af62c8
   .claude/skills/apm-bug-repro/SKILL.md: sha256:707f98ca54fa453849522e02bf8a815bc1fb9a6ae225011d10835e03db1ce3e1
-  .claude/skills/issue-authoring/SKILL.md: sha256:1bf94878683313a3d66e58d26c7cf007f48cdc870d7c2d3ca7ebb4d547305df0
+  .claude/skills/issue-authoring/SKILL.md: sha256:80ae14e5a09090669d949d83a41afda02ed3d4d0ac1a06b59d9649671649b37d

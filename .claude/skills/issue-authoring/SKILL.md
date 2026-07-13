@@ -10,8 +10,7 @@ root-cause → repro-dir steps are in the `apm-bug-repro` skill.)
 
 ## The issue file
 
-Create `issue-<slug>.md` from the canonical template at the repo root
-(`issue-template.md`):
+Create `issue-<slug>.md` from the canonical template:
 
 ```markdown
 # [BUG] xxxxx
@@ -21,6 +20,7 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
+
 1. Run command '...'
 2. With parameters '....'
 3. See error
@@ -29,10 +29,11 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **Environment (please complete the following information):**
- - OS: [e.g. macOS, Linux, Windows]
- - Python Version: [e.g. 3.12.0]
- - APM Version: [e.g. 0.1.0]
- - VSCode Version (if relevant): [e.g. 1.80.0]
+
+- OS: [e.g. macOS, Linux, Windows]
+- Python Version: [e.g. 3.12.0]
+- APM Version: [e.g. 0.1.0]
+- VSCode Version (if relevant): [e.g. 1.80.0]
 
 **Logs**
 If applicable, add any error logs or screenshots.
@@ -70,8 +71,7 @@ Conventions when filling it in:
 ## The feature request file
 
 When the finding is a missing capability rather than broken behavior, write a
-feature request instead. Create `feature-<slug>.md` from the canonical template
-at the repo root (`feature-request-template.md`):
+feature request instead. Create `feature-<slug>.md` from the canonical template:
 
 ```markdown
 # [FEATURE] xxxxx
@@ -103,6 +103,7 @@ Conventions when filling it in:
 ## The README entry
 
 Add both:
+
 - a one-line entry to the top index, and
 - a per-bug section: brief setup + a `Reproduce` block listing the `make` targets
   and what each demonstrates.

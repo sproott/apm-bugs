@@ -1,0 +1,11 @@
+name: demo-hook-pkg
+version: 1.0.0
+description: Local package with a script-backed Copilot hook, installed to user scope (~/.copilot/) for the relative-path demo.
+author: sproott
+targets:
+  - copilot
+dependencies:
+  apm: []
+  mcp: []
+includes: auto
+scripts: {}

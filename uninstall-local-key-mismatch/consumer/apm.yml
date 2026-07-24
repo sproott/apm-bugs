@@ -1,0 +1,15 @@
+name: consumer
+version: 1.0.0
+description: Project-scope consumer that declares a local dependency by relative path.
+author: sproott
+targets:
+  - claude
+dependencies:
+  # Declared as a relative path. apm deps list renders it as `_local/mypkg`,
+  # but that displayed key is not accepted by apm uninstall -- only this exact
+  # `../mypkg` path is.
+  apm:
+    - ../mypkg
+  mcp: []
+includes: auto
+scripts: {}

@@ -56,6 +56,14 @@ the issue files:
   Scripted/CI init is stuck with boilerplate defaults (`description: APM project
   for <name>`) and must hand-edit `apm.yml` — even though sibling `apm marketplace
   init` already has `--name`/`--owner`. (Observed on `apm` **v0.24.0**.)
+- [`issue-uninstall-local-key-mismatch.md`](issue-uninstall-local-key-mismatch.md) —
+  `apm deps list` prints a local dependency under the key `_local/<name>`, but
+  `apm uninstall _local/<name>` reports `not found in apm.yml` and removes nothing
+  (exit 0). `deps list` renders local deps from `repo_url` (`_local/<name>`) while
+  `uninstall` matches on `get_identity()` (the declared `local_path`, e.g.
+  `../mypkg`), so the shown key never round-trips. Both scopes; user scope is worse
+  — the only accepted key is a machine-specific absolute path shown nowhere.
+  (Observed on `apm` **v0.26.0**.)
 - [`feature-recursive-install-audit.md`](feature-recursive-install-audit.md)
   (**RFE**, not a bug) — `apm install` and `apm audit` operate only on the
   directory they run from: in a monorepo with nested `apm.yml` packages, root
@@ -400,6 +408,51 @@ make agents                 # clean + `apm init --target agents` + install
                             #      install aborts: Unknown target 'agents' (exit 2)
 
 make reproduce              # all three in order
+```
+
+## Uninstall rejects the `_local/<name>` key (`uninstall-local-key-mismatch/`)
+
+### Setup
+
+A local dependency is declared by path. In the project scenario,
+[`consumer/apm.yml`](uninstall-local-key-mismatch/consumer/apm.yml) declares the
+sibling package [`mypkg/`](uninstall-local-key-mismatch/mypkg/) by relative path:
+
+```yaml
+# consumer/apm.yml
+dependencies:
+  apm:
+    - ../mypkg
+```
+
+`apm deps list` renders it in the Package column as `_local/mypkg` (from the
+dependency's `repo_url`), but `apm uninstall` matches its arguments on
+`get_identity()` — the declared `local_path` (`../mypkg`) — so
+`apm uninstall _local/mypkg` reports `not found in apm.yml` and removes nothing
+(exit 0). The displayed key does not round-trip. Full write-up in
+[`issue-uninstall-local-key-mismatch.md`](issue-uninstall-local-key-mismatch.md).
+
+The `user` target repeats this under user scope with an isolated `HOME=fake-home/`
+(the real `~/.apm` is untouched); there the dep is installed by absolute path
+(relative paths are rejected at user scope), so the only accepted uninstall key is
+a machine-specific absolute path shown nowhere in `apm deps list -g`.
+
+`make clean` removes the installed `apm_modules/`, lockfile, generated target dirs,
+and `fake-home/`.
+
+### Reproduce
+
+```bash
+apm --version               # 0.26.0
+cd uninstall-local-key-mismatch
+
+make project                # clean + install + `apm deps list` + `apm uninstall _local/mypkg`
+                            #   -> deps list shows key `_local/mypkg`;
+                            #      uninstall by that key: "not found in apm.yml" (exit 0, no-op)
+
+make user                   # same under `-g` with isolated HOME=fake-home/
+                            #   -> deps list -g shows `_local/mypkg`;
+                            #      uninstall -g by that key: "not found in apm.yml"
 ```
 
 ## Recursive install/audit gap (`recursive-install-audit/`) — RFE

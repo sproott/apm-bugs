@@ -1,0 +1,11 @@
+name: mypkg
+version: 1.0.0
+description: A local package, consumed by relative path (project scope) and absolute path (user scope).
+author: sproott
+targets:
+  - claude
+dependencies:
+  apm: []
+  mcp: []
+includes: auto
+scripts: {}
